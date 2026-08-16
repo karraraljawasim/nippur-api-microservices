@@ -38,7 +38,23 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/api-gateway-e2e/**/*"]
+      "exclude": ["apps/api-gateway-e2e/**/*", "apps/auth-service-e2e/**/*"]
     }
-  ]
+  ],
+  "targetDefaults": {
+    "@nx/js:tsc": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    },
+    "build": {
+      "options": {
+        "assets": [{
+          "glob": "*.proto",
+          "input": "libs/shared-contracts/protos",
+          "output": "libs/shared-contracts/protos"
+        }]
+      }
+    }
+  }
 }
