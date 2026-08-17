@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package users;
+
+service UserService {
+  rpc createUser (CreateUserRequest) returns (PublicUserResponse);
+}
+
+message PublicUserResponse {
+  string id = 1;
+  string name = 2;
+}
+
+message CreateUserRequest {
+  string id = 1;
+  string name = 2;
+
+}

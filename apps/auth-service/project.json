@@ -23,6 +23,24 @@
         }
       }
     },
+    "db-generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "drizzle-kit generate --config=apps/auth-service/drizzle.config.ts"
+      }
+    },
+    "db-migrate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "drizzle-kit migrate --config=apps/auth-service/drizzle.config.ts"
+      }
+    },
+    "db-studio": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "drizzle-kit studio --config=apps/auth-service/drizzle.config.ts"
+      }
+    },
     "prune-lockfile": {
       "dependsOn": ["build"],
       "cache": true,
