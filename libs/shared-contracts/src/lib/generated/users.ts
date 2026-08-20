@@ -7,34 +7,75 @@
 /* eslint-disable */
 import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
 import { Observable } from "rxjs";
+import { Timestamp } from "./google/protobuf/timestamp";
 
 export const protobufPackage = "users";
 
-export interface PublicUserResponse {
-  id: string;
-  name: string;
+export enum UserRole {
+  USER_ROLE_UNSPECIFIED = 0,
+  USER_ROLE_CUSTOMER = 1,
+  USER_ROLE_RESTAURANT_OWNER = 2,
+  USER_ROLE_DRIVER = 3,
+  USER_ROLE_ADMIN = 4,
+  UNRECOGNIZED = -1,
 }
 
 export interface CreateUserRequest {
+  name: string;
+  email: string;
+  passwordHash: string;
+}
+
+export interface GetUserByIdRequest {
+  userId: string;
+}
+
+export interface GetUserByEmailRequest {
+  email: string;
+}
+
+export interface User {
   id: string;
   name: string;
+  email: string;
+  passwordHash: string;
+  role: UserRole;
+  isActive: boolean;
+  createdAt: Timestamp | undefined;
+  updatedAt: Timestamp | undefined;
+}
+
+export interface PublicUser {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  isActive: boolean;
+  createdAt: Timestamp | undefined;
+  updatedAt: Timestamp | undefined;
 }
 
 export const USERS_PACKAGE_NAME = "users";
 
 export interface UserServiceClient {
-  createUser(request: CreateUserRequest): Observable<PublicUserResponse>;
+  createUser(request: CreateUserRequest): Observable<PublicUser>;
+
+  getById(request: GetUserByIdRequest): Observable<PublicUser>;
+
+  getByEmail(request: GetUserByEmailRequest): Observable<User>;
 }
 
 export interface UserServiceController {
-  createUser(
-    request: CreateUserRequest,
-  ): Promise<PublicUserResponse> | Observable<PublicUserResponse> | PublicUserResponse;
+  createUser(request: CreateUserRequest): Promise<PublicUser> | Observable<PublicUser> | PublicUser;
+
+  getById(request: GetUserByIdRequest): Promise<PublicUser> | Observable<PublicUser> | PublicUser;
+
+  getByEmail(request: GetUserByEmailRequest): Promise<User> | Observable<User> | User;
 }
 
 export function UserServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["createUser"];
+    const grpcMethods: string[] = ["createUser", "getById", "getByEmail"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("UserService", method)(constructor.prototype[method], method, descriptor);

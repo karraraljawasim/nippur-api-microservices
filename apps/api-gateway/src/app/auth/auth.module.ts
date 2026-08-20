@@ -2,9 +2,14 @@ import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AUTH } from '@nippur-api-microservice/shared-contracts';
+import { PassportModule } from '@nestjs/passport';
+import { ConfigModule } from '@nestjs/config';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { RoleGuard } from './guards/roles.guard';
 
 @Module({
   imports: [
+    ConfigModule,
     ClientsModule.register([
       {
         name: AUTH.AUTH_PACKAGE_NAME,
@@ -16,8 +21,10 @@ import { AUTH } from '@nippur-api-microservice/shared-contracts';
         },
       },
     ]),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [AuthController],
-  providers: [],
+  providers: [JwtAuthGuard, RoleGuard],
+  exports: [PassportModule, JwtAuthGuard, RoleGuard],
 })
 export class AuthModule {}

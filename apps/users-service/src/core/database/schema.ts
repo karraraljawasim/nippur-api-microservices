@@ -8,12 +8,13 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 import { v7 as uuidv7 } from 'uuid';
+import { UserRole } from '../../app/users/enum/user-role.enum';
 
 export const userRoleEnum = pgEnum('user_role', [
-  'customer',
-  'restaurant_owner',
-  'driver',
-  'admin',
+  UserRole.Customer,
+  UserRole.Admin,
+  UserRole.Driver,
+  UserRole.RestaurantOwner,
 ]);
 
 export const users = pgTable('users', {
@@ -23,7 +24,7 @@ export const users = pgTable('users', {
   name: varchar('name', { length: 100 }).notNull(),
   email: varchar('email', { length: 150 }).notNull().unique(),
   passwordHash: text('password_hash').notNull(),
-  role: userRoleEnum('role').notNull().default('customer'),
+  role: userRoleEnum('role').notNull().default(UserRole.Customer),
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),

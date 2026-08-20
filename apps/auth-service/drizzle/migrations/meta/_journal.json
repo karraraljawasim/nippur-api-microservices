@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1786968207833,
-      "tag": "0000_faithful_crystal",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1786970265413,
-      "tag": "0001_giant_big_bertha",
+      "when": 1787054141549,
+      "tag": "0000_funny_baron_zemo",
       "breakpoints": true
     }
   ]

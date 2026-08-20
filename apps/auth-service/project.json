@@ -41,6 +41,13 @@
         "command": "drizzle-kit studio --config=apps/auth-service/drizzle.config.ts"
       }
     },
+    "compose-up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker compose up -d",
+        "cwd": "{projectRoot}"
+      }
+    },
     "prune-lockfile": {
       "dependsOn": ["build"],
       "cache": true,

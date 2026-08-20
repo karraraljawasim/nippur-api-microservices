@@ -10,28 +10,30 @@ import { Observable } from "rxjs";
 
 export const protobufPackage = "auth";
 
-export interface LoginRequest {
+export interface RegisterUserRequest {
+  name: string;
   email: string;
   password: string;
 }
 
-export interface LoginResponse {
-  token: string;
+export interface RegisterResponse {
+  accessToken: string;
+  refreshToken: string;
 }
 
 export const AUTH_PACKAGE_NAME = "auth";
 
 export interface AuthServiceClient {
-  login(request: LoginRequest): Observable<LoginResponse>;
+  register(request: RegisterUserRequest): Observable<RegisterResponse>;
 }
 
 export interface AuthServiceController {
-  login(request: LoginRequest): Promise<LoginResponse> | Observable<LoginResponse> | LoginResponse;
+  register(request: RegisterUserRequest): Promise<RegisterResponse> | Observable<RegisterResponse> | RegisterResponse;
 }
 
 export function AuthServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["login"];
+    const grpcMethods: string[] = ["register"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("AuthService", method)(constructor.prototype[method], method, descriptor);

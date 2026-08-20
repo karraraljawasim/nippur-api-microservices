@@ -7,20 +7,43 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { status as GrpcStatus } from '@grpc/grpc-js';
+
+const grpcToHttpStatus: Record<number, number> = {
+  [GrpcStatus.INVALID_ARGUMENT]: HttpStatus.BAD_REQUEST,
+  [GrpcStatus.UNAUTHENTICATED]: HttpStatus.UNAUTHORIZED,
+  [GrpcStatus.PERMISSION_DENIED]: HttpStatus.FORBIDDEN,
+  [GrpcStatus.NOT_FOUND]: HttpStatus.NOT_FOUND,
+  [GrpcStatus.ALREADY_EXISTS]: HttpStatus.CONFLICT,
+  [GrpcStatus.INTERNAL]: HttpStatus.INTERNAL_SERVER_ERROR,
+  [GrpcStatus.UNAVAILABLE]: HttpStatus.SERVICE_UNAVAILABLE,
+};
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
 
-  catch(exception: unknown, host: ArgumentsHost) {
+  catch(exception: any, host: ArgumentsHost) {
     const response = host.switchToHttp().getResponse<Response>();
 
-    const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+    let status: number;
+    let message: string;
 
-    const message = this.getMessage(exception);
+    if (exception instanceof HttpException) {
+      status = exception.getStatus();
+      message = this.getMessage(exception);
+    } else if (exception?.code !== undefined) {
+      status =
+        grpcToHttpStatus[exception.code] ?? HttpStatus.INTERNAL_SERVER_ERROR;
+      message =
+        exception.details || exception.message || 'Downstream service error';
+    } else {
+      status = HttpStatus.INTERNAL_SERVER_ERROR;
+      message =
+        exception instanceof Error
+          ? exception.message
+          : 'Internal server error';
+    }
 
     if (status >= 500) {
       this.logger.error(
@@ -36,16 +59,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
     });
   }
 
-  private getMessage(exception: unknown): string {
-    if (exception instanceof HttpException) {
-      const res = exception.getResponse();
-      if (typeof res === 'string') return res;
-      if (typeof res === 'object' && res !== null && 'message' in res) {
-        const msg = res.message;
-        return Array.isArray(msg) ? msg.join(', ') : String(msg);
-      }
+  private getMessage(exception: HttpException): string {
+    const res = exception.getResponse();
+    if (typeof res === 'string') return res;
+    if (typeof res === 'object' && res !== null && 'message' in res) {
+      const msg = (res as any).message;
+      return Array.isArray(msg) ? msg.join(', ') : String(msg);
     }
-    if (exception instanceof Error) return exception.message;
-    return 'Internal server error';
+    return exception.message;
   }
 }

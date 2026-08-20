@@ -1,7 +1,8 @@
 import { Body, Controller, Inject, OnModuleInit, Post } from '@nestjs/common';
 import { AUTH } from '@nippur-api-microservice/shared-contracts';
 import { ClientGrpc } from '@nestjs/microservices';
-import { LoginDto } from './dto/login.dto';
+import { RegisterUserDto } from './dto/register-user.dto';
+import { firstValueFrom } from 'rxjs';
 
 @Controller('auth')
 export class AuthController implements OnModuleInit {
@@ -14,8 +15,8 @@ export class AuthController implements OnModuleInit {
     );
   }
 
-  @Post('login')
-  login(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
+  @Post('register')
+  async register(@Body() dto: RegisterUserDto) {
+    return await firstValueFrom(this.authService.register(dto));
   }
 }

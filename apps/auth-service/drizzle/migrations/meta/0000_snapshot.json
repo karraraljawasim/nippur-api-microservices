@@ -1,5 +1,5 @@
 {
-  "id": "072a25b5-a6f9-42ad-a3bf-cf47a685e860",
+  "id": "2dcf68f0-4c10-4471-aac7-3512c35069a2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -12,8 +12,7 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "user_id": {
           "name": "user_id",
@@ -23,7 +22,7 @@
         },
         "token_hash": {
           "name": "token_hash",
-          "type": "varchar(255)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
