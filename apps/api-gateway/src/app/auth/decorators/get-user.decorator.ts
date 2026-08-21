@@ -1,15 +1,12 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { USERS } from '@nippur-api-microservice/shared-contracts';
 import { Request } from 'express';
+import { JwtPayload } from '../types/auth.types';
 
 type RequestWithUser = Request & {
-  user: Omit<USERS.User, 'passwordHash'>;
+  user: JwtPayload;
 };
 export const GetUser = createParamDecorator(
-  (
-    data: keyof Omit<USERS.User, 'passwordHash'> | undefined,
-    ctx: ExecutionContext,
-  ) => {
+  (data: 'sub' | 'role' | undefined, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest<RequestWithUser>();
     if (data) {
       return request.user[data];

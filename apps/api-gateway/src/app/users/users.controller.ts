@@ -1,7 +1,18 @@
-import { Body, Controller, Inject, OnModuleInit, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Inject,
+  OnModuleInit,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { USERS } from '@nippur-api-microservice/shared-contracts';
-import { CreateUserDto } from './dto/create-user.dto';
+import { GetUserByIdDto } from './dto/get-user-by-id.dto';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RoleGuard } from '../auth/guards/roles.guard';
+import { UserRole } from '../auth/enum/user-role.enum';
 
 @Controller('users')
 export class UsersController implements OnModuleInit {
@@ -14,8 +25,10 @@ export class UsersController implements OnModuleInit {
     );
   }
 
-  @Post()
-  createUser(@Body() dto: CreateUserDto) {
-    return this.userService.createUser(dto);
+  @Get(':userId')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(UserRole.Admin)
+  findById(@Param() dto: GetUserByIdDto) {
+    return this.userService.getById(dto);
   }
 }

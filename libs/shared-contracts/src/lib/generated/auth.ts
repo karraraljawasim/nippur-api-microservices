@@ -16,7 +16,17 @@ export interface RegisterUserRequest {
   password: string;
 }
 
+export interface LoginUserRequest {
+  email: string;
+  password: string;
+}
+
 export interface RegisterResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
 }
@@ -25,15 +35,19 @@ export const AUTH_PACKAGE_NAME = "auth";
 
 export interface AuthServiceClient {
   register(request: RegisterUserRequest): Observable<RegisterResponse>;
+
+  login(request: LoginUserRequest): Observable<LoginResponse>;
 }
 
 export interface AuthServiceController {
   register(request: RegisterUserRequest): Promise<RegisterResponse> | Observable<RegisterResponse> | RegisterResponse;
+
+  login(request: LoginUserRequest): Promise<LoginResponse> | Observable<LoginResponse> | LoginResponse;
 }
 
 export function AuthServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["register"];
+    const grpcMethods: string[] = ["register", "login"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("AuthService", method)(constructor.prototype[method], method, descriptor);

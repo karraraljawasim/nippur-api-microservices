@@ -54,7 +54,7 @@ export class UsersService {
 
   async getByEmailWithPassword(email: string) {
     const user = await this.usersRepository.findByEmail(email);
-    if (user) {
+    if (!user) {
       throw new RpcException({
         code: GrpcStatus.NOT_FOUND,
         message: 'User not found',

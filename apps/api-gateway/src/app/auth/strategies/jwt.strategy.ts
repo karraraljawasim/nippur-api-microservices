@@ -7,7 +7,6 @@ import { ConfigService } from '@nestjs/config';
 import { JwtPayload } from '../types/auth.types';
 import { USERS } from '@nippur-api-microservice/shared-contracts';
 import { ClientGrpc } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class JwtStrategy
@@ -32,11 +31,6 @@ export class JwtStrategy
     );
   }
   async validate(payload: JwtPayload) {
-    const user = await firstValueFrom(
-      this.usersService.getById({ userId: payload.sub }),
-    );
-    if (!user) return null;
-
-    return user;
+    return payload;
   }
 }

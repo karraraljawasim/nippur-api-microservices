@@ -7,7 +7,7 @@ import "google/protobuf/timestamp.proto";
 service UserService {
   rpc createUser (CreateUserRequest) returns (PublicUser);
   rpc getById (GetUserByIdRequest) returns (PublicUser);
-  rpc getByEmail (GetUserByEmailRequest) returns (User);
+  rpc getByEmailWithPassword (GetUserByEmailRequest) returns (User);
 }
 
 

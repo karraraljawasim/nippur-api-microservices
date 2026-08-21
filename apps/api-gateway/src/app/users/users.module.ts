@@ -2,9 +2,11 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { USERS } from '@nippur-api-microservice/shared-contracts';
 import { UsersController } from './users.controller';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
+    AuthModule,
     ClientsModule.register([
       {
         name: USERS.USERS_PACKAGE_NAME,

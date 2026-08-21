@@ -1,7 +1,7 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { USERS } from '@nippur-api-microservice/shared-contracts';
-import { ClientGrpc } from '@nestjs/microservices';
+import { ClientGrpc, RpcException } from '@nestjs/microservices';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { firstValueFrom } from 'rxjs';
 import { randomUUID } from 'node:crypto';
@@ -12,6 +12,8 @@ import { AuthRepository } from './auth.repository';
 import { ConfigService } from '@nestjs/config';
 import { AUTH_CONSTANTS } from './constants/auth.constants';
 import { mapProtoRoleToInternal } from './helpers/map-proto-role-to-internal.helper';
+import { LoginUserDto } from './dto/login-user.dto';
+import { status as GrpcStatus } from '@grpc/grpc-js';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -39,6 +41,39 @@ export class AuthService implements OnModuleInit {
         passwordHash,
       }),
     );
+
+    return this.issueTokens({
+      sub: user.id,
+      role: mapProtoRoleToInternal(user.role),
+    });
+  }
+
+  async login(dto: LoginUserDto) {
+    let user: USERS.User;
+    try {
+      user = await firstValueFrom(
+        this.usersService.getByEmailWithPassword({ email: dto.email }),
+      );
+    } catch (error) {
+      console.error(error);
+      throw new RpcException({
+        code: GrpcStatus.UNAUTHENTICATED,
+        message: 'Invalid email or password.',
+      });
+    }
+
+    const isValidPassword = await bcrypt.compare(
+      dto.password,
+      user.passwordHash,
+    );
+
+    console.error(isValidPassword);
+    if (!isValidPassword) {
+      throw new RpcException({
+        code: GrpcStatus.UNAUTHENTICATED,
+        message: 'Invalid email or password.',
+      });
+    }
 
     return this.issueTokens({
       sub: user.id,

@@ -3,6 +3,7 @@ import { AUTH } from '@nippur-api-microservice/shared-contracts';
 import { ClientGrpc } from '@nestjs/microservices';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { firstValueFrom } from 'rxjs';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Controller('auth')
 export class AuthController implements OnModuleInit {
@@ -18,5 +19,10 @@ export class AuthController implements OnModuleInit {
   @Post('register')
   async register(@Body() dto: RegisterUserDto) {
     return await firstValueFrom(this.authService.register(dto));
+  }
+
+  @Post('login')
+  async login(@Body() dto: LoginUserDto) {
+    return await firstValueFrom(this.authService.login(dto));
   }
 }

@@ -5,6 +5,7 @@ package auth;
 
 service AuthService {
   rpc register (RegisterUserRequest) returns (RegisterResponse);
+  rpc login (LoginUserRequest) returns (LoginResponse);
 }
 
 message RegisterUserRequest {
@@ -14,7 +15,17 @@ message RegisterUserRequest {
 
 }
 
+message LoginUserRequest {
+  string email = 1;
+  string password = 2;
+}
+
 message RegisterResponse {
+  string accessToken = 1;
+  string refreshToken = 2;
+}
+
+message LoginResponse {
   string accessToken = 1;
   string refreshToken = 2;
 }

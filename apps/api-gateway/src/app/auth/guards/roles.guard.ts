@@ -7,12 +7,11 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ROLE_KEY } from '../decorators/roles.decorator';
 import { Request } from 'express';
-import { USERS } from '@nippur-api-microservice/shared-contracts';
 import { UserRole } from '../enum/user-role.enum';
-import { mapProtoRoleToInternal } from '../helpers/map-proto-role-to-internal.helper';
+import { JwtPayload } from '../types/auth.types';
 
 type RequestWithUser = Request & {
-  user: Omit<USERS.User, 'passwordHash'>;
+  user: JwtPayload;
 };
 
 @Injectable()
@@ -29,7 +28,7 @@ export class RoleGuard implements CanActivate {
     }
 
     const { user } = context.switchToHttp().getRequest<RequestWithUser>();
-    if (!requiredRole.includes(mapProtoRoleToInternal(user.role))) {
+    if (!requiredRole.includes(user.role as UserRole)) {
       throw new ForbiddenException(
         'You do not have permission to access this resource',
       );
