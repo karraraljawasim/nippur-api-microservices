@@ -35,4 +35,19 @@ export class UsersRepository {
 
     return row;
   }
+  async updateById(
+    userId: string,
+    data: { name?: string; isActive?: boolean },
+  ) {
+    const [row] = await this.db
+      .update(users)
+      .set({
+        name: data.name,
+        isActive: data.isActive,
+      })
+      .where(eq(users.id, userId))
+      .returning();
+
+    return row;
+  }
 }

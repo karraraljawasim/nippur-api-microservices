@@ -55,6 +55,12 @@ export interface PublicUser {
   updatedAt: Timestamp | undefined;
 }
 
+export interface UpdateCurrentUserRequest {
+  userId: string;
+  name?: string | undefined;
+  isActive?: boolean | undefined;
+}
+
 export const USERS_PACKAGE_NAME = "users";
 
 export interface UserServiceClient {
@@ -63,6 +69,8 @@ export interface UserServiceClient {
   getById(request: GetUserByIdRequest): Observable<PublicUser>;
 
   getByEmailWithPassword(request: GetUserByEmailRequest): Observable<User>;
+
+  updateCurrentUser(request: UpdateCurrentUserRequest): Observable<PublicUser>;
 }
 
 export interface UserServiceController {
@@ -71,11 +79,13 @@ export interface UserServiceController {
   getById(request: GetUserByIdRequest): Promise<PublicUser> | Observable<PublicUser> | PublicUser;
 
   getByEmailWithPassword(request: GetUserByEmailRequest): Promise<User> | Observable<User> | User;
+
+  updateCurrentUser(request: UpdateCurrentUserRequest): Promise<PublicUser> | Observable<PublicUser> | PublicUser;
 }
 
 export function UserServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["createUser", "getById", "getByEmailWithPassword"];
+    const grpcMethods: string[] = ["createUser", "getById", "getByEmailWithPassword", "updateCurrentUser"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("UserService", method)(constructor.prototype[method], method, descriptor);

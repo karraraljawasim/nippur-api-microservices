@@ -1,4 +1,4 @@
-export enum UserRole {
+export enum InternalUserRole {
   Admin = 'admin',
   Customer = 'customer',
   RestaurantOwner = 'restaurant_owner',

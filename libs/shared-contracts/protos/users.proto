@@ -8,6 +8,7 @@ service UserService {
   rpc createUser (CreateUserRequest) returns (PublicUser);
   rpc getById (GetUserByIdRequest) returns (PublicUser);
   rpc getByEmailWithPassword (GetUserByEmailRequest) returns (User);
+  rpc updateCurrentUser (UpdateCurrentUserRequest) returns (PublicUser);
 }
 
 
@@ -53,4 +54,10 @@ message PublicUser {
   bool is_active = 5;
   google.protobuf.Timestamp created_at = 6;
   google.protobuf.Timestamp updated_at = 7;
+}
+
+message UpdateCurrentUserRequest {
+  string userId = 1;
+  optional string name = 2;
+  optional bool isActive = 3;
 }

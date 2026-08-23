@@ -3,8 +3,8 @@ import { RpcException } from '@nestjs/microservices';
 import { status as GrpcStatus } from '@grpc/grpc-js';
 import { UsersRepository } from './users.repository';
 import { CreateUserDto } from './dto/create-user.dto';
-import { mapInternalRoleToProto } from './helpers/map-internal-role-to-proto.helpers';
-import { dateToTimestamp } from './helpers/date-to-timestamp.helpers';
+import { HELPERS } from '@nippur-api-microservice/shared-contracts';
+import { UpdateCurrentUserDto } from './dto/update-current-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -26,15 +26,15 @@ export class UsersService {
       name: newUser.name,
       email: newUser.email,
       isActive: newUser.isActive,
-      role: mapInternalRoleToProto(newUser.role),
-      createdAt: dateToTimestamp(newUser.createdAt),
-      updatedAt: dateToTimestamp(newUser.updatedAt),
+      role: HELPERS.mapInternalUserRoleToProto(newUser.role),
+      createdAt: HELPERS.dateToTimestamp(newUser.createdAt),
+      updatedAt: HELPERS.dateToTimestamp(newUser.updatedAt),
     };
   }
 
   async getById(userId: string) {
     const user = await this.usersRepository.findById(userId);
-    if (user) {
+    if (!user) {
       throw new RpcException({
         code: GrpcStatus.NOT_FOUND,
         message: 'User not found',
@@ -46,9 +46,9 @@ export class UsersService {
       name: user.name,
       email: user.email,
       isActive: user.isActive,
-      role: mapInternalRoleToProto(user.role),
-      createdAt: dateToTimestamp(user.createdAt),
-      updatedAt: dateToTimestamp(user.updatedAt),
+      role: HELPERS.mapInternalUserRoleToProto(user.role),
+      createdAt: HELPERS.dateToTimestamp(user.createdAt),
+      updatedAt: HELPERS.dateToTimestamp(user.updatedAt),
     };
   }
 
@@ -67,9 +67,43 @@ export class UsersService {
       email: user.email,
       passwordHash: user.passwordHash,
       isActive: user.isActive,
-      role: mapInternalRoleToProto(user.role),
-      createdAt: dateToTimestamp(user.createdAt),
-      updatedAt: dateToTimestamp(user.updatedAt),
+      role: HELPERS.mapInternalUserRoleToProto(user.role),
+      createdAt: HELPERS.dateToTimestamp(user.createdAt),
+      updatedAt: HELPERS.dateToTimestamp(user.updatedAt),
+    };
+  }
+
+  async updateById(dto: UpdateCurrentUserDto) {
+    const user = await this.usersRepository.findById(dto.userId);
+    if (!user) {
+      throw new RpcException({
+        code: GrpcStatus.NOT_FOUND,
+        message: 'User not found',
+      });
+    }
+
+    if (dto.isActive === undefined && dto.name === undefined) {
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        isActive: user.isActive,
+        role: HELPERS.mapInternalUserRoleToProto(user.role),
+        createdAt: HELPERS.dateToTimestamp(user.createdAt),
+        updatedAt: HELPERS.dateToTimestamp(user.updatedAt),
+      };
+    }
+
+    const updatedUser = await this.usersRepository.updateById(dto.userId, dto);
+
+    return {
+      id: updatedUser.id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      isActive: updatedUser.isActive,
+      role: HELPERS.mapInternalUserRoleToProto(updatedUser.role),
+      createdAt: HELPERS.dateToTimestamp(updatedUser.createdAt),
+      updatedAt: HELPERS.dateToTimestamp(updatedUser.updatedAt),
     };
   }
 }

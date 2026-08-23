@@ -1,6 +1,6 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { USERS } from '@nippur-api-microservice/shared-contracts';
+import { HELPERS, USERS } from '@nippur-api-microservice/shared-contracts';
 import { ClientGrpc, RpcException } from '@nestjs/microservices';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { firstValueFrom } from 'rxjs';
@@ -11,7 +11,6 @@ import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { AuthRepository } from './auth.repository';
 import { ConfigService } from '@nestjs/config';
 import { AUTH_CONSTANTS } from './constants/auth.constants';
-import { mapProtoRoleToInternal } from './helpers/map-proto-role-to-internal.helper';
 import { LoginUserDto } from './dto/login-user.dto';
 import { status as GrpcStatus } from '@grpc/grpc-js';
 
@@ -44,7 +43,7 @@ export class AuthService implements OnModuleInit {
 
     return this.issueTokens({
       sub: user.id,
-      role: mapProtoRoleToInternal(user.role),
+      role: HELPERS.mapProtoUserRoleToInternal(user.role),
     });
   }
 
@@ -77,7 +76,7 @@ export class AuthService implements OnModuleInit {
 
     return this.issueTokens({
       sub: user.id,
-      role: mapProtoRoleToInternal(user.role),
+      role: HELPERS.mapProtoUserRoleToInternal(user.role),
     });
   }
 

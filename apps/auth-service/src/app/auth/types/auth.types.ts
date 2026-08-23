@@ -1,8 +1,8 @@
-import { UserRole } from '../enum/user-role.enum';
+import { USERS } from '@nippur-api-microservice/shared-contracts';
 
 export type JwtPayload = {
   sub: string;
-  role: UserRole;
+  role: USERS.InternalUserRole;
 };
 
 export interface TokenPair {
