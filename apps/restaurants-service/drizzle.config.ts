@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 import { resolve } from 'node:path';
 
 dotenv.config({
-  path: resolve(process.cwd(), 'apps/users-service/.env'),
+  path: resolve(process.cwd(), 'apps/restaurants-service/.env'),
 });
 
 if (!process.env.DATABASE_URL) {
@@ -11,8 +11,8 @@ if (!process.env.DATABASE_URL) {
 }
 
 export default defineConfig({
-  schema: './apps/users-service/src/core/database/schema.ts',
-  out: './apps/users-service/drizzle/migrations',
+  schema: './apps/restaurants-service/src/core/database/schema.ts',
+  out: './apps/restaurants-service/drizzle/migrations',
   dialect: 'postgresql',
   dbCredentials: {
     url: process.env.DATABASE_URL,

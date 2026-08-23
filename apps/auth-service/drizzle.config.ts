@@ -1,7 +1,10 @@
 import { defineConfig } from 'drizzle-kit';
 import * as dotenv from 'dotenv';
+import { resolve } from 'node:path';
 
-dotenv.config({ path: 'apps/auth-service/.env' });
+dotenv.config({
+  path: resolve(process.cwd(), 'apps/auth-service/.env'),
+});
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not defined in the environment variables');

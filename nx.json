@@ -42,7 +42,8 @@
         "apps/api-gateway-e2e/**/*",
         "apps/auth-service-e2e/**/*",
         "users-service-e2e/**/*",
-        "apps/users-service-e2e/**/*"
+        "apps/users-service-e2e/**/*",
+        "apps/restaurants-service-e2e/**/*"
       ]
     }
   ],
