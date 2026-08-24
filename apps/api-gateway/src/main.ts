@@ -1,7 +1,6 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
-import { FILTERS } from '@nippur-api-microservice/shared-contracts';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,7 +14,6 @@ async function bootstrap() {
     }),
   );
 
-  app.useGlobalFilters(new FILTERS.AllExceptionsFilter());
   await app.listen(port);
   Logger.log(
     `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`,

@@ -3,9 +3,13 @@ syntax = "proto3";
 package restaurants;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 
 service RestaurantsService {
   rpc createRestaurant (CreateRestaurantRequest) returns (Restaurant) ;
+  rpc getById (GetRestaurantByIdRequest) returns (Restaurant);
+  rpc updateById (UpdateRestaurantByIdRequest) returns (Restaurant);
+  rpc getAll (google.protobuf.Empty) returns (GetAllRestaurantResponse);
 }
 
 message CreateRestaurantRequest  {
@@ -28,3 +32,22 @@ message Restaurant  {
   google.protobuf.Timestamp created_at = 8;
   google.protobuf.Timestamp updated_at = 9;
 }
+message GetRestaurantByIdRequest {
+  string restaurantId = 1;
+}
+
+message UpdateRestaurantByIdRequest  {
+  string restaurantId = 1;
+  string userId = 2;
+  optional string name = 3;
+  optional string address = 4;
+  optional string description = 5;
+  optional string phone = 6;
+  optional bool  isOpen = 7;
+
+}
+
+message GetAllRestaurantResponse {
+  repeated Restaurant restaurants = 1;
+}
+

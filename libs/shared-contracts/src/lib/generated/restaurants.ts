@@ -7,6 +7,7 @@
 /* eslint-disable */
 import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
 import { Observable } from "rxjs";
+import { Empty } from "./google/protobuf/empty";
 import { Timestamp } from "./google/protobuf/timestamp";
 
 export const protobufPackage = "restaurants";
@@ -31,19 +32,51 @@ export interface Restaurant {
   updatedAt: Timestamp | undefined;
 }
 
+export interface GetRestaurantByIdRequest {
+  restaurantId: string;
+}
+
+export interface UpdateRestaurantByIdRequest {
+  restaurantId: string;
+  userId: string;
+  name?: string | undefined;
+  address?: string | undefined;
+  description?: string | undefined;
+  phone?: string | undefined;
+  isOpen?: boolean | undefined;
+}
+
+export interface GetAllRestaurantResponse {
+  restaurants: Restaurant[];
+}
+
 export const RESTAURANTS_PACKAGE_NAME = "restaurants";
 
 export interface RestaurantsServiceClient {
   createRestaurant(request: CreateRestaurantRequest): Observable<Restaurant>;
+
+  getById(request: GetRestaurantByIdRequest): Observable<Restaurant>;
+
+  updateById(request: UpdateRestaurantByIdRequest): Observable<Restaurant>;
+
+  getAll(request: Empty): Observable<GetAllRestaurantResponse>;
 }
 
 export interface RestaurantsServiceController {
   createRestaurant(request: CreateRestaurantRequest): Promise<Restaurant> | Observable<Restaurant> | Restaurant;
+
+  getById(request: GetRestaurantByIdRequest): Promise<Restaurant> | Observable<Restaurant> | Restaurant;
+
+  updateById(request: UpdateRestaurantByIdRequest): Promise<Restaurant> | Observable<Restaurant> | Restaurant;
+
+  getAll(
+    request: Empty,
+  ): Promise<GetAllRestaurantResponse> | Observable<GetAllRestaurantResponse> | GetAllRestaurantResponse;
 }
 
 export function RestaurantsServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["createRestaurant"];
+    const grpcMethods: string[] = ["createRestaurant", "getById", "updateById", "getAll"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("RestaurantsService", method)(constructor.prototype[method], method, descriptor);
