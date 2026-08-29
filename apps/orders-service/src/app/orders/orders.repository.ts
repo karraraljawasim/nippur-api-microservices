@@ -3,6 +3,7 @@ import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { CreateOrderInput } from './types/create-order-input.type';
 import { orders } from '../../core/database/schema';
 import { DATABASE_CONNECTION } from '../../core/database/drizzle.providers';
+import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class OrdersRepository {
@@ -14,5 +15,20 @@ export class OrdersRepository {
     const [order] = await this.db.insert(orders).values(data).returning();
 
     return order;
+  }
+
+  async getOrderById(ordersId: string) {
+    const [row] = await this.db
+      .select()
+      .from(orders)
+      .where(eq(orders.id, ordersId));
+    return row;
+  }
+
+  async getOrdersByCustomerId(customerId: string) {
+    return await this.db
+      .select()
+      .from(orders)
+      .where(eq(orders.customerId, customerId));
   }
 }

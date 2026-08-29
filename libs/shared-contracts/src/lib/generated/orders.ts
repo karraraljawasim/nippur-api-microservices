@@ -7,8 +7,32 @@
 /* eslint-disable */
 import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
 import { Observable } from "rxjs";
+import { Timestamp } from "./google/protobuf/timestamp";
 
 export const protobufPackage = "order";
+
+export interface GetUserOrdersRequest {
+  userId: string;
+}
+
+export interface GetUserOrdersResponse {
+  order: Order[];
+}
+
+export interface GetOrderWithItemsRequest {
+  orderId: string;
+  userId: string;
+}
+
+export interface Order {
+  id: string;
+  customerId: string;
+  restaurantId: string;
+  status: string;
+  total: string;
+  createdAt: Timestamp | undefined;
+  updatedAt: Timestamp | undefined;
+}
 
 export interface OrderItemInput {
   menuItemId: string;
@@ -41,15 +65,27 @@ export const ORDER_PACKAGE_NAME = "order";
 
 export interface OrderServiceClient {
   createOrder(request: CreateOrderRequest): Observable<OrderResponse>;
+
+  getOrderWithItems(request: GetOrderWithItemsRequest): Observable<OrderResponse>;
+
+  getUserOrders(request: GetUserOrdersRequest): Observable<GetUserOrdersResponse>;
 }
 
 export interface OrderServiceController {
   createOrder(request: CreateOrderRequest): Promise<OrderResponse> | Observable<OrderResponse> | OrderResponse;
+
+  getOrderWithItems(
+    request: GetOrderWithItemsRequest,
+  ): Promise<OrderResponse> | Observable<OrderResponse> | OrderResponse;
+
+  getUserOrders(
+    request: GetUserOrdersRequest,
+  ): Promise<GetUserOrdersResponse> | Observable<GetUserOrdersResponse> | GetUserOrdersResponse;
 }
 
 export function OrderServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["createOrder"];
+    const grpcMethods: string[] = ["createOrder", "getOrderWithItems", "getUserOrders"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("OrderService", method)(constructor.prototype[method], method, descriptor);

@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Get,
   Inject,
   OnModuleInit,
+  Param,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -36,5 +38,22 @@ export class OrdersController implements OnModuleInit {
     return await firstValueFrom(
       this.ordersService.createOrder({ customerId: userId, ...dto }),
     );
+  }
+
+  @Get(':orderId')
+  @UseGuards(JwtAuthGuard)
+  async getOrderWithItems(
+    @Param('orderId') orderId: string,
+    @GetUser('sub') userId: string,
+  ) {
+    return await firstValueFrom(
+      this.ordersService.getOrderWithItems({ orderId, userId }),
+    );
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  async getUserOrders(@GetUser('sub') userId: string) {
+    return await firstValueFrom(this.ordersService.getUserOrders({ userId }));
   }
 }

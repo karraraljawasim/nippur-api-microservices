@@ -1,5 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { RESTAURANTS } from '@nippur-api-microservice/shared-contracts';
+import {
+  HELPERS,
+  RESTAURANTS,
+} from '@nippur-api-microservice/shared-contracts';
 import { OrdersRepository } from './orders.repository';
 import { OrderItemRepository } from './order-item.repository';
 import { ClientGrpc, RpcException } from '@nestjs/microservices';
@@ -73,11 +76,48 @@ export class OrdersService {
       return await firstValueFrom(
         this.menuService.getMenuItems({ ids }).pipe(timeout(5000)),
       );
-    } catch (error) {
+    } catch {
       throw new RpcException({
         code: GrpcStatus.UNAVAILABLE,
         message: 'Could not validate menu items',
       });
     }
+  }
+
+  async getOrderWithItems(orderId: string, userId: string) {
+    const order = await this.ordersRepository.getOrderById(orderId);
+    if (!order) {
+      throw new RpcException({
+        code: GrpcStatus.NOT_FOUND,
+        message: `Order ${orderId} not found`,
+      });
+    }
+    if (order.customerId !== userId) {
+      throw new RpcException({
+        code: GrpcStatus.PERMISSION_DENIED,
+        message: 'You can see jest your order',
+      });
+    }
+
+    const items =
+      await this.orderItemRepository.getOrderItemsByOrderId(orderId);
+
+    return { ...order, items };
+  }
+
+  async getOrdersByCustomerId(customerId: string) {
+    const row = await this.ordersRepository.getOrdersByCustomerId(customerId);
+
+    const order = row.map((o) => ({
+      id: o.id,
+      customerId: o.customerId,
+      restaurantId: o.restaurantId,
+      status: o.status,
+      total: o.total,
+      createdAt: HELPERS.dateToTimestamp(o.createdAt),
+      updatedAt: HELPERS.dateToTimestamp(o.updatedAt),
+    }));
+
+    return { order };
   }
 }
