@@ -12,6 +12,31 @@ service RestaurantsService {
   rpc getAll (google.protobuf.Empty) returns (GetAllRestaurantResponse);
 }
 
+service MenuService {
+  rpc createMenuItem (CreateMenuItemRequest) returns (MenuItem);
+  rpc getAllMenuItems (GetAllMenuItemsRequest) returns (GetAllMenuItemsResponse);
+  rpc updateMenuItem (UpdateMenuItemRequest) returns (MenuItem);
+  rpc deleteMenuItem (DeleteMenuItemRequest) returns (MenuItem);
+  rpc getById (GetMenuItemByIdRequest) returns (MenuItem);
+  rpc getMenuItems (GetMenuItemsRequest) returns (GetMenuItemsResponse);
+}
+
+
+message GetMenuItemsRequest {
+  repeated string  ids = 1;
+}
+
+message GetMenuItemsResponse {
+  repeated MenuItems items = 1 ;
+}
+
+message MenuItems {
+  string id = 1;
+  string restaurantId = 2;
+  string  name = 3;
+  string price = 4;
+  bool available = 5;
+}
 message CreateRestaurantRequest  {
   string ownerId = 1;
   string name = 2;
@@ -51,3 +76,53 @@ message GetAllRestaurantResponse {
   repeated Restaurant restaurants = 1;
 }
 
+message CreateMenuItemRequest {
+  string userId = 1;
+  string restaurantId = 2;
+  string name = 3;
+  string price = 4;
+  optional string description = 5;
+}
+
+message MenuItem {
+  string id = 1;
+  string  restaurantId = 2;
+  string name = 3;
+  string price = 4;
+  bool available = 5;
+  optional string description = 6;
+  google.protobuf.Timestamp createdAt = 7;
+}
+
+message GetAllMenuItemsResponse {
+  repeated PublicItem menuItems = 1;
+}
+
+message PublicItem {
+  string  id = 1;
+  string name = 2;
+  string  price = 3;
+  string description = 4;
+}
+message GetAllMenuItemsRequest {
+  string restaurantId = 1;
+}
+
+message UpdateMenuItemRequest {
+  string menuItemId = 1;
+  optional string price = 2;
+  optional bool available = 3;
+  string restaurantId = 4;
+  string userId = 5;
+}
+
+message DeleteMenuItemRequest {
+  string menuItemId = 1;
+  string restaurantId = 2;
+  string userId = 3;
+}
+
+message GetMenuItemByIdRequest {
+  string menuItemId = 1;
+  string restaurantId = 2;
+}

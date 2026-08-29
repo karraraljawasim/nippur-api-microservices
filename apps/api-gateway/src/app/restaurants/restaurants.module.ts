@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { RestaurantsController } from './restaurants.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { RESTAURANTS } from '@nippur-api-microservice/shared-contracts';
+import { MenuController } from './menu.controller';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { RESTAURANTS } from '@nippur-api-microservice/shared-contracts';
       },
     ]),
   ],
-  controllers: [RestaurantsController],
+  controllers: [RestaurantsController, MenuController],
   providers: [],
 })
 export class RestaurantsModule {}

@@ -31,16 +31,6 @@ export class AuthService implements OnModuleInit {
     );
   }
   async register(dto: RegisterUserDto) {
-    const userExists = await firstValueFrom(
-      this.usersService.getByEmailWithPassword({ email: dto.email }),
-    );
-
-    if (userExists) {
-      throw new RpcException({
-        code: GrpcStatus.ALREADY_EXISTS,
-        message: 'User with this email already exists',
-      });
-    }
     const passwordHash = await bcrypt.hash(dto.password, 10);
 
     const user = await firstValueFrom(
@@ -76,7 +66,6 @@ export class AuthService implements OnModuleInit {
       user.passwordHash,
     );
 
-    console.error(isValidPassword);
     if (!isValidPassword) {
       throw new RpcException({
         code: GrpcStatus.UNAUTHENTICATED,
