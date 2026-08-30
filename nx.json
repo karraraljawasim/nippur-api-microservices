@@ -45,7 +45,8 @@
         "apps/users-service-e2e/**/*",
         "apps/restaurants-service-e2e/**/*",
         "apps/orders-service-e2e/**/*",
-        "apps/payment-service-e2e/**/*"
+        "apps/payment-service-e2e/**/*",
+        "apps/notification-service-e2e/**/*"
       ]
     }
   ],

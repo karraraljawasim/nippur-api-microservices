@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   EVENT_PATTERN,
   HELPERS,
+  NOTIFICATION_RABBITMQ_CLIENT,
   ORDER_RABBITMQ_CLIENT,
   RESTAURANTS,
 } from '@nippur-api-microservice/shared-contracts';
@@ -22,6 +23,8 @@ export class OrdersService {
     private orderItemRepository: OrderItemRepository,
     @Inject(RESTAURANTS.RESTAURANTS_PACKAGE_NAME) private client: ClientGrpc,
     @Inject(ORDER_RABBITMQ_CLIENT) private orderRabbitMqClient: ClientProxy,
+    @Inject(NOTIFICATION_RABBITMQ_CLIENT)
+    private notificationRabbitMqClient: ClientProxy,
   ) {
     this.menuService = this.client.getService<RESTAURANTS.MenuServiceClient>(
       RESTAURANTS.MENU_SERVICE_NAME,
@@ -73,6 +76,13 @@ export class OrdersService {
     );
 
     this.orderRabbitMqClient
+      .emit(EVENT_PATTERN.ORDER_CREATED, {
+        orderId: order.id,
+        total: order.total,
+      })
+      .subscribe();
+
+    this.notificationRabbitMqClient
       .emit(EVENT_PATTERN.ORDER_CREATED, {
         orderId: order.id,
         total: order.total,

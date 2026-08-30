@@ -5,6 +5,8 @@ import { OrdersRepository } from './orders.repository';
 import { OrderItemRepository } from './order-item.repository';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import {
+  NOTIFICATION_QUEUE,
+  NOTIFICATION_RABBITMQ_CLIENT,
   ORDER_QUEUE,
   ORDER_RABBITMQ_CLIENT,
   RESTAURANTS,
@@ -33,6 +35,21 @@ import { OrdersEventController } from './orders-event.controller';
           options: {
             urls: [config.get<string>('RABBITMQ_URL')],
             queue: ORDER_QUEUE,
+            queueOptions: { durable: true },
+          },
+        }),
+        inject: [ConfigService],
+      },
+    ]),
+
+    ClientsModule.registerAsync([
+      {
+        name: NOTIFICATION_RABBITMQ_CLIENT,
+        useFactory: (config: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [config.get<string>('RABBITMQ_URL')],
+            queue: NOTIFICATION_QUEUE,
             queueOptions: { durable: true },
           },
         }),
