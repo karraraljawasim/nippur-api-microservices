@@ -1,14 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
+  EVENT_PATTERN,
   HELPERS,
+  ORDER_RABBITMQ_CLIENT,
   RESTAURANTS,
 } from '@nippur-api-microservice/shared-contracts';
 import { OrdersRepository } from './orders.repository';
 import { OrderItemRepository } from './order-item.repository';
-import { ClientGrpc, RpcException } from '@nestjs/microservices';
+import { ClientGrpc, ClientProxy, RpcException } from '@nestjs/microservices';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { firstValueFrom, timeout } from 'rxjs';
 import { status as GrpcStatus } from '@grpc/grpc-js';
+import { OrderStatusEnum } from './enums/order-status.enum';
 
 @Injectable()
 export class OrdersService {
@@ -18,6 +21,7 @@ export class OrdersService {
     private ordersRepository: OrdersRepository,
     private orderItemRepository: OrderItemRepository,
     @Inject(RESTAURANTS.RESTAURANTS_PACKAGE_NAME) private client: ClientGrpc,
+    @Inject(ORDER_RABBITMQ_CLIENT) private orderRabbitMqClient: ClientProxy,
   ) {
     this.menuService = this.client.getService<RESTAURANTS.MenuServiceClient>(
       RESTAURANTS.MENU_SERVICE_NAME,
@@ -67,6 +71,13 @@ export class OrdersService {
     await this.orderItemRepository.createMany(
       resolvedItems.map((item) => ({ ...item, orderId: order.id })),
     );
+
+    this.orderRabbitMqClient
+      .emit(EVENT_PATTERN.ORDER_CREATED, {
+        orderId: order.id,
+        total: order.total,
+      })
+      .subscribe();
 
     return { ...order, items };
   }
@@ -119,5 +130,25 @@ export class OrdersService {
     }));
 
     return { order };
+  }
+
+  async handleStatusOnPayment(orderId: string, success: boolean) {
+    if (success) {
+      await this.ordersRepository.updateOrderStatus(
+        OrderStatusEnum.CONFIRMED,
+        orderId,
+      );
+
+      return;
+    }
+
+    if (!success) {
+      await this.ordersRepository.updateOrderStatus(
+        OrderStatusEnum.CANCELLED,
+        orderId,
+      );
+
+      return;
+    }
   }
 }

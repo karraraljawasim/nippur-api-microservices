@@ -4,7 +4,13 @@ import { OrdersService } from './orders.service';
 import { OrdersRepository } from './orders.repository';
 import { OrderItemRepository } from './order-item.repository';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { RESTAURANTS } from '@nippur-api-microservice/shared-contracts';
+import {
+  ORDER_QUEUE,
+  ORDER_RABBITMQ_CLIENT,
+  RESTAURANTS,
+} from '@nippur-api-microservice/shared-contracts';
+import { ConfigService } from '@nestjs/config';
+import { OrdersEventController } from './orders-event.controller';
 
 @Module({
   imports: [
@@ -19,8 +25,22 @@ import { RESTAURANTS } from '@nippur-api-microservice/shared-contracts';
         },
       },
     ]),
+    ClientsModule.registerAsync([
+      {
+        name: ORDER_RABBITMQ_CLIENT,
+        useFactory: (config: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [config.get<string>('RABBITMQ_URL')],
+            queue: ORDER_QUEUE,
+            queueOptions: { durable: true },
+          },
+        }),
+        inject: [ConfigService],
+      },
+    ]),
   ],
-  controllers: [OrdersController],
+  controllers: [OrdersController, OrdersEventController],
   providers: [OrdersService, OrdersRepository, OrderItemRepository],
 })
 export class OrdersModule {}

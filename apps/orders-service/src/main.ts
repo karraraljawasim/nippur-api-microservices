@@ -2,7 +2,15 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { FILTERS, ORDERS } from '@nippur-api-microservice/shared-contracts';
+import {
+  FILTERS,
+  ORDERS,
+  PAYMENT_QUEUE,
+} from '@nippur-api-microservice/shared-contracts';
+import * as dotenv from 'dotenv';
+import { resolve } from 'node:path';
+
+dotenv.config({ path: resolve(process.cwd(), 'apps/orders-service/.env') });
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,8 +26,8 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: ['amqp://guest:guest@localhost:5672'],
-      queue: 'orders-queue',
+      urls: [process.env.RABBITMQ_URL],
+      queue: PAYMENT_QUEUE,
       queueOptions: {
         durable: true,
       },
@@ -36,7 +44,7 @@ async function bootstrap() {
   app.useGlobalFilters(new FILTERS.AllRpcExceptionsFilter());
   await app.startAllMicroservices();
 
-  Logger.log(`🚀 Application is listing on RabbitMq`);
+  Logger.log(`🚀 Order is running on gRPC, and listing on RabbitMq`);
 }
 
 bootstrap();

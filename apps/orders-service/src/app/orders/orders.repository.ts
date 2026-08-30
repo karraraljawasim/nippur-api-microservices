@@ -4,6 +4,7 @@ import { CreateOrderInput } from './types/create-order-input.type';
 import { orders } from '../../core/database/schema';
 import { DATABASE_CONNECTION } from '../../core/database/drizzle.providers';
 import { eq } from 'drizzle-orm';
+import { OrderStatusEnum } from './enums/order-status.enum';
 
 @Injectable()
 export class OrdersRepository {
@@ -30,5 +31,12 @@ export class OrdersRepository {
       .select()
       .from(orders)
       .where(eq(orders.customerId, customerId));
+  }
+
+  async updateOrderStatus(status: OrderStatusEnum, orderId: string) {
+    await this.db
+      .update(orders)
+      .set({ status: status })
+      .where(eq(orders.id, orderId));
   }
 }

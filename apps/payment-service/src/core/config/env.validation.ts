@@ -3,9 +3,6 @@ import { plainToInstance } from 'class-transformer';
 
 export class EnvironmentVariables {
   @IsNotEmpty()
-  DATABASE_URL: string;
-
-  @IsNotEmpty()
   RABBITMQ_URL: string;
 }
 
