@@ -38,7 +38,16 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/api-gateway-e2e/**/*", "apps/auth-service-e2e/**/*"]
+      "exclude": [
+        "apps/api-gateway-e2e/**/*",
+        "apps/auth-service-e2e/**/*",
+        "users-service-e2e/**/*",
+        "apps/users-service-e2e/**/*",
+        "apps/restaurants-service-e2e/**/*",
+        "apps/orders-service-e2e/**/*",
+        "apps/payment-service-e2e/**/*",
+        "apps/notification-service-e2e/**/*"
+      ]
     }
   ],
   "targetDefaults": {
@@ -49,11 +58,13 @@
     },
     "build": {
       "options": {
-        "assets": [{
-          "glob": "*.proto",
-          "input": "libs/shared-contracts/protos",
-          "output": "libs/shared-contracts/protos"
-        }]
+        "assets": [
+          {
+            "glob": "*.proto",
+            "input": "libs/shared-contracts/protos",
+            "output": "libs/shared-contracts/protos"
+          }
+        ]
       }
     }
   }
