@@ -4,7 +4,7 @@ import { CreateRestaurantsDto } from './dto/create-restaurants.dto';
 import { RestaurantsRepository } from './restaurants.repository';
 import { GetRestaurantByIdDto } from './dto/get-restaurant-by-id.dto';
 import { RpcException } from '@nestjs/microservices';
-import { GrpcStatus } from '@nestjs/microservices/enums/grpc-status.enum';
+import { status as GrpcStatus } from '@grpc/grpc-js';
 import { UpdateRestaurantByIdDto } from './dto/update-restaurant-by-id.dto';
 
 @Injectable()

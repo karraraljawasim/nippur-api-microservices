@@ -8,6 +8,7 @@ describe('AuthController', () => {
   const mockClientGrpc = {
     getService: jest.fn().mockReturnValue({
       login: jest.fn(),
+      register: jest.fn(),
     }),
   };
 

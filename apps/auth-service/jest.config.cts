@@ -7,4 +7,5 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../../coverage/apps/auth-service',
+  transformIgnorePatterns: ['/node_modules/(?!(uuid)/)'],
 };

@@ -7,4 +7,5 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../../coverage/apps/restaurants-service',
+  transformIgnorePatterns: ['/node_modules/(?!(uuid)/)'],
 };

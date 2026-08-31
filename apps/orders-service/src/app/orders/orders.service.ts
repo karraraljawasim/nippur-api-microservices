@@ -92,19 +92,6 @@ export class OrdersService {
     return { ...order, items };
   }
 
-  async getMenuItemSafely(ids: string[]) {
-    try {
-      return await firstValueFrom(
-        this.menuService.getMenuItems({ ids }).pipe(timeout(5000)),
-      );
-    } catch {
-      throw new RpcException({
-        code: GrpcStatus.UNAVAILABLE,
-        message: 'Could not validate menu items',
-      });
-    }
-  }
-
   async getOrderWithItems(orderId: string, userId: string) {
     const order = await this.ordersRepository.getOrderById(orderId);
     if (!order) {
@@ -159,6 +146,19 @@ export class OrdersService {
       );
 
       return;
+    }
+  }
+
+  private async getMenuItemSafely(ids: string[]) {
+    try {
+      return await firstValueFrom(
+        this.menuService.getMenuItems({ ids }).pipe(timeout(5000)),
+      );
+    } catch {
+      throw new RpcException({
+        code: GrpcStatus.UNAVAILABLE,
+        message: 'Could not validate menu items',
+      });
     }
   }
 }

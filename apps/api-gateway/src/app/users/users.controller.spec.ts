@@ -7,7 +7,9 @@ describe('UsersController', () => {
 
   const mockClientGrpc = {
     getService: jest.fn().mockReturnValue({
-      createUser: jest.fn(),
+      getById: jest.fn(),
+      updateMyProfile: jest.fn(),
+      getMyProfile: jest.fn(),
     }),
   };
   beforeEach(async () => {
